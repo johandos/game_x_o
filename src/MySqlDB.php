@@ -6,18 +6,18 @@ use mysqli;
 
 class MySqlDB
 {
-    private string $host = "127.0.0.1";
-    private string $user = "root";
-    private string $pass = "";
-    private string $dbname = "game_x_o";
-    private mysqli|false $connection;
+    protected string $host = "127.0.0.1";
+    protected string $user = "root";
+    protected string $pass = "";
+    protected string $dbname = "game_x_o";
+    protected mysqli|false $connection;
 
     function __construct()
     {
         $this->setConnection();
     }
 
-    public function setConnection(): void
+    protected function setConnection(): void
     {
         $this->connection = @mysqli_connect(
             $this->host,
@@ -28,12 +28,12 @@ class MySqlDB
         $this->connection->set_charset('utf8');
     }
 
-    public function getConnection(): bool|mysqli
+    protected function getConnection(): bool|mysqli
     {
         return $this->connection;
     }
 
-    public function executeQuery($sql): array
+    protected function executeQuery($sql): array
     {
         $data = [];
         $result = mysqli_query($this->getConnection(), $sql);
@@ -46,13 +46,13 @@ class MySqlDB
         return $data;
     }
 
-    public function numRows($sql): int
+    protected function numRows($sql): int
     {
         $result = mysqli_query($this->connection, $sql);
         return mysqli_num_rows($result);
     }
 
-    public function getDataSingle($sql): array|null
+    protected function getDataSingle($sql): array|null
     {
         $result = mysqli_query($this->connection, $sql);
         if (mysqli_num_rows($result) > 0){
@@ -62,12 +62,12 @@ class MySqlDB
         return null;
     }
 
-    public function getLastId(): int|string
+    protected function getLastId(): int|string
     {
         return mysqli_insert_id($this->connection);
     }
 
-    public function close(): void
+    protected function close(): void
     {
         mysqli_close($this->connection);
     }

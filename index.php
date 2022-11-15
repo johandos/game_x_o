@@ -3,10 +3,13 @@
 require __DIR__ . '/vendor/autoload.php';
 
 use App\GameBoard;
-use App\Players;
 use App\WinValidated;
-use App\MySqlDB;
-session_start();
+use App\Session;
+
+$session = new Session();
+$firstPlayer = $session->getAttribute('firstPlayer');
+$secondPlayer = $session->getAttribute('secondPlayer');
+
 ?>
 
 <html lang="es">
@@ -25,16 +28,8 @@ session_start();
                     <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Bienvenido al juego 3 en raya</p>
                     <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600">Juega con tus amigos para saber quien es el mejor en 3 en raya</p>
                 <?php else: ?>
-                    <?php if($_SESSION['firstPlayer'] && $_SESSION['secondPlayer']): ?>
-                        <h2 class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"> <?= "{$_SESSION['firstPlayer']} vs {$_SESSION['secondPlayer']}" ?> </h2>
-
-                        <?php
-                            $db = new MySqlDB();
-                            $data = $db->executeQuery("SELECT * FROM games");
-
-
-                            $db->close();
-                        ?>
+                    <?php if($firstPlayer && $secondPlayer): ?>
+                        <h2 class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"> <?= "$firstPlayer vs $secondPlayer" ?> </h2>
                     <?php endif; ?>
                 <?php endif; ?>
             </div>
@@ -43,7 +38,7 @@ session_start();
                 <?php if($_REQUEST):
                     $gameBoard = new GameBoard;
                     if ($_POST):
-                        $firstPlayer = new Players($_POST['playerOne'], $_POST['playerTwo']);
+                        //$firstPlayer = new Players($_POST['playerOne'], $_POST['playerTwo']);
                         $gameBoard->initialize();
                         $playerTurn = 1;
                     else:
@@ -52,10 +47,10 @@ session_start();
                     endif; ?>
 
                     <?php if ($playerTurn == 2): ?>
-                        <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600"><?= "El turno es para: {$_SESSION['secondPlayer']}"; ?></p>
+                        <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600"><?= "El turno es para: $secondPlayer"; ?></p>
                         <?php $playerTurn = 1; ?>
                     <?php else: ?>
-                        <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600"><?= "El turno es para: {$_SESSION['firstPlayer']}"; ?></p>
+                        <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600"><?= "El turno es para: $firstPlayer"; ?></p>
                         <?php $playerTurn = 2; ?>
                     <?php endif; ?>
 
@@ -78,8 +73,8 @@ session_start();
                             </div>
 
                             <form name="empezar" action="index.php" method="post">
-                                <input type="hidden" name="playerOne" value="<?= $_SESSION["firstPlayer"] ?>">
-                                <input type="hidden" name="playerTwo" value="<?= $_SESSION["secondPlayer"] ?>">
+                                <input type="hidden" name="playerOne" value="<?= $firstPlayer ?>">
+                                <input type="hidden" name="playerTwo" value="<?= $secondPlayer ?>">
                                 <div class="py-4">
                                     <button type="submit" name="empezar" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
                                         Volver a empezar
