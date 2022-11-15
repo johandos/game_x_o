@@ -2,13 +2,20 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
+use App\Models\Game;
 use App\Services\GameBoardService;
 use App\Services\WinValidatedService;
 use App\Utils\Session;
+use App\Models\Players;
 
 $session = new Session();
-$firstPlayer = $session->getAttribute('firstPlayer');
-$secondPlayer = $session->getAttribute('secondPlayer');
+$firstPlayerSession = $session->getAttribute('firstPlayer');
+$secondPlayerSession = $session->getAttribute('secondPlayer');
+
+if($firstPlayerSession && $secondPlayerSession):
+    $firstPlayerName = new Players(); $firstPlayerName = $firstPlayerName->getFirstPlayer();
+    $secondPlayerName = new Players(); $secondPlayerName = $secondPlayerName->getSecondPlayer();
+endif;
 
 ?>
 
@@ -28,53 +35,72 @@ $secondPlayer = $session->getAttribute('secondPlayer');
                     <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Bienvenido al juego 3 en raya</p>
                     <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600">Juega con tus amigos para saber quien es el mejor en 3 en raya</p>
                 <?php else: ?>
-                    <?php if($firstPlayer && $secondPlayer): ?>
-                        <h2 class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"> <?= "$firstPlayer vs $secondPlayer" ?> </h2>
+                    <?php if($firstPlayerSession && $secondPlayerSession): ?>
+                        <?php $firstPlayerName = new Players(); $firstPlayerName = $firstPlayerName->getFirstPlayer(); ?>
+                        <?php $secondPlayerName = new Players(); $secondPlayerName = $secondPlayerName->getSecondPlayer(); ?>
+                        <h2 class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"> <?= "{$firstPlayerName['name']} vs {$secondPlayerName['name']}" ?> </h2>
                     <?php endif; ?>
                 <?php endif; ?>
             </div>
 
             <div class="mt-20 max-w-lg sm:mx-auto md:max-w-none flex flex-col items-center">
                 <?php if($_REQUEST):
+                    $playerTurn = isset($_GET['turn']) && (int)$_GET['turn'] === $secondPlayerSession ? $firstPlayerSession : $secondPlayerSession;
                     $gameBoard = new GameBoardService;
                     if ($_POST):
-                        //$firstPlayer = new PlayersController($_POST['playerOne'], $_POST['playerTwo']);
-                        $gameBoard->initialize();
-                        $playerTurn = 1;
+                        $firstPlayer = new Players();
+                        $firstPlayer->savePlayer($_POST["playerOne"]);
+                        $firstPlayerId = $firstPlayer->getLastInsert();
+
+                        $secondPlayer = new Players();
+                        $secondPlayer->savePlayer($_POST["playerTwo"]);
+                        $secondPlayerId = $secondPlayer->getLastInsert();
+
+                        $session->setAttribute('firstPlayer', $firstPlayerId);
+                        $session->setAttribute('secondPlayer', $secondPlayerId);
+
+                        $initializeGame = new Game();
+                        $gamePositions = $gameBoard->initialize();
+                        $initializeGame->saveGame($gamePositions);
                     else:
-                        $playerTurn = $_GET['turn'];
-                        $gameBoard->savePositionInGame($_GET['pos'], $playerTurn);
+                        $game = new Game();
+                        $gameSession = $game->getGameInSession();
+
+                        $gameBoard->savePositionInGame($_GET['position'], $playerTurn, $gameSession["id"]);
                     endif; ?>
 
-                    <?php if ($playerTurn == 2): ?>
-                        <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600"><?= "El turno es para: $secondPlayer"; ?></p>
-                        <?php $playerTurn = 1; ?>
+                    <?php if ($playerTurn === $firstPlayerSession): ?>
+                        <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600"><?= "El turno es para: {$secondPlayerName['name']}"; ?></p>
                     <?php else: ?>
-                        <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600"><?= "El turno es para: $firstPlayer"; ?></p>
-                        <?php $playerTurn = 2; ?>
+                        <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600"><?= "El turno es para: {$firstPlayerName['name']}"; ?></p>
                     <?php endif; ?>
-
                     <div class="flex flex-col">
                         <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
                             <div class="py-2 inline-block min-w-full sm:px-6 lg:px-8">
                                 <div class="overflow-hidden">
                                     <table class="border-collapse border border-slate-500">
                                         <tbody>
-                                            <?php for ($i = 1; $i <= 3; $i++): ?>
-                                                <tr class="bg-white border-b">
-                                                    <?php for ($j = 1; $j <= 3; $j++): ?>
-                                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r"><?= $gameBoard->showPositions($i . $j, $playerTurn) ?></td>
-                                                    <?php endfor; ?>
-                                                </tr>
-                                            <?php endfor; ?>
+                                            <?php
+                                            $gameInSession = new Game();
+                                            $gameInSession = $gameInSession->getGameInSession();
+                                            $createTr = true;
+                                            foreach(json_decode($gameInSession['positions']) as $key => $position): ?>
+                                                <?php if(str_ends_with($key, "1")): ?>
+                                                    <tr class="bg-white border-b">
+                                                <?php endif; ?>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r"><?= $gameBoard->showPositions($key, $position, $playerTurn) ?></td>
+                                                <?php if(str_ends_with($key, "3")): ?>
+                                                    </tr>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
 
                             <form name="empezar" action="index.php" method="post">
-                                <input type="hidden" name="playerOne" value="<?= $firstPlayer ?>">
-                                <input type="hidden" name="playerTwo" value="<?= $secondPlayer ?>">
+                                <input type="hidden" name="playerOne" value="<?= $firstPlayerName['name'] ?>">
+                                <input type="hidden" name="playerTwo" value="<?= $secondPlayerName['name'] ?>">
                                 <div class="py-4">
                                     <button type="submit" name="empezar" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
                                         Volver a empezar
@@ -87,7 +113,7 @@ $secondPlayer = $session->getAttribute('secondPlayer');
                         </div>
                     </div>
                 <?php else: ?>
-                    <form name="juego" action="./src/Controllers/GameController.php" method="post">
+                    <form name="juego" action="index.php" method="post">
                         <div class="grid grid-cols-1 gap-y-16 md:grid-cols-2 md:gap-x-12 md:gap-y-16">
                             <div class="relative flex flex-col gap-6 sm:flex-row md:flex-col lg:flex-row">
                                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-500 text-white sm:shrink-0">
@@ -128,29 +154,27 @@ $secondPlayer = $session->getAttribute('secondPlayer');
                     </form>
                 <?php endif; ?>
             </div>
-            <?php if($_REQUEST):
-                $validateGame = new WinValidatedService; ?>
-                <?php if ($validateGame->validated()): ?>
-                    <div class="relative flex justify-center items-center">
-                        <div id="menu" class="w-full h-full bg-gray-900 bg-opacity-80 top-0 fixed sticky-0">
-                            <div class="2xl:container  2xl:mx-auto py-48 px-4 md:px-28 flex justify-center items-center">
-                                <div class="w-96 md:w-auto dark:bg-gray-800 relative flex flex-col justify-center items-center bg-white py-16 px-4 md:px-24 xl:py-24 xl:px-36">
-                                    <div class="mt-12">
-                                        <h1 role="main" class="text-3xl dark:text-white lg:text-4xl font-semibold leading-7 lg:leading-9 text-center text-gray-800">
-                                            <?= "El jugador ganador es {$validateGame->validated()}"; ?>
-                                        </h1>
-                                    </div>
-                                    <button onclick="showMenu(true)" class="text-gray-800 dark:text-gray-400 absolute top-8 right-8 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800" aria-label="close">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M18 6L6 18" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" />
-                                            <path d="M6 6L18 18" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                    </button>
+            <?php $validateGame = new WinValidatedService; ?>
+            <?php if ($validateGame->validated()): ?>
+                <div class="relative flex justify-center items-center">
+                    <div id="menu" class="w-full h-full bg-gray-900 bg-opacity-80 top-0 fixed sticky-0">
+                        <div class="2xl:container  2xl:mx-auto py-48 px-4 md:px-28 flex justify-center items-center">
+                            <div class="w-96 md:w-auto dark:bg-gray-800 relative flex flex-col justify-center items-center bg-white py-16 px-4 md:px-24 xl:py-24 xl:px-36">
+                                <div class="mt-12">
+                                    <h1 role="main" class="text-3xl dark:text-white lg:text-4xl font-semibold leading-7 lg:leading-9 text-center text-gray-800">
+                                        <?= "El jugador ganador es {$validateGame->validated()}"; ?>
+                                    </h1>
                                 </div>
+                                <button onclick="showMenu(true)" class="text-gray-800 dark:text-gray-400 absolute top-8 right-8 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800" aria-label="close">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M18 6L6 18" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M6 6L18 18" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                     </div>
-                <?php endif; ?>
+                </div>
             <?php endif; ?>
         </div>
     </div>

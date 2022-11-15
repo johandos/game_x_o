@@ -37,6 +37,7 @@ class MySqlDB
     {
         $data = [];
         $result = mysqli_query($this->getConnection(), $sql);
+
         if (mysqli_num_rows($result) > 0){
             while ($row = mysqli_fetch_assoc($result)){
                 $data[] = $row;
@@ -44,6 +45,11 @@ class MySqlDB
         }
 
         return $data;
+    }
+
+    protected function executeInsert($sql): bool
+    {
+        return mysqli_query($this->getConnection(), $sql);
     }
 
     protected function numRows($sql): int
@@ -62,7 +68,7 @@ class MySqlDB
         return null;
     }
 
-    protected function getLastId(): int|string
+    protected function getLastInsert(): int|string
     {
         return mysqli_insert_id($this->connection);
     }

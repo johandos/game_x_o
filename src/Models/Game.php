@@ -9,11 +9,20 @@ class Game extends MySqlDB
 {
     public function getGameInSession(): array
     {
-        $data = MySqlDB::executeQuery("SELECT * FROM games 
+        return MySqlDB::executeQuery("SELECT * FROM games 
          WHERE first_player_id = {$_SESSION['firstPlayer']} 
-           AND second_player_id = {$_SESSION['secondPlayer']}");
+           AND second_player_id = {$_SESSION['secondPlayer']}")[0];
+    }
 
-        MySqlDB::close();
-        return $data;
+    public function saveGame($gamePositions): bool
+    {
+        MySqlDB::executeInsert("INSERT INTO games (first_player_id, second_player_id, positions) 
+            VALUES ('{$_SESSION['firstPlayer']}', '{$_SESSION['secondPlayer']}', '{$gamePositions}')");
+        return true;
+    }
+
+    public function updateGamePosition($position, $valuePosition, $gameId): bool
+    {
+        return MySqlDB::executeInsert("UPDATE games SET positions = JSON_SET(positions, '$.$position', '$valuePosition') WHERE id = {$gameId}");
     }
 }

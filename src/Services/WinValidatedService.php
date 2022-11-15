@@ -2,70 +2,81 @@
 
 namespace App\Services;
 
+use App\Models\Game;
+use App\Utils\Session;
+
 class WinValidatedService
 {
     public function validated(): string
     {
         $winner = false;
 
-        if ($_SESSION["pos11"] == "1" && $_SESSION["pos21"] == "1" && $_SESSION["pos31"] == "1"){
-            $winner = $_SESSION["secondPlayer"];
+        $gameInSession = new Game();
+        $gameInSession = $gameInSession->getGameInSession();
+        $gameInSession = json_decode($gameInSession["positions"]);
+
+        $session = new Session();
+        $firstPlayerSession = $session->getAttribute('firstPlayer');
+        $secondPlayerSession = $session->getAttribute('secondPlayer');
+
+        if ($gameInSession->{"pos11"} == $firstPlayerSession && $gameInSession->{"pos21"} == $firstPlayerSession && $gameInSession->{"pos31"} == $firstPlayerSession){
+            $winner = $firstPlayerSession;
         }
 
-        if ($_SESSION["pos21"] == "2" && $_SESSION["pos22"] == "2" && $_SESSION["pos23"] == "2"){
-            $winner = $_SESSION["firstPlayer"];
+        if ($gameInSession->{"pos21"} == $secondPlayerSession && $gameInSession->{"pos22"} == $secondPlayerSession && $gameInSession->{"pos23"} == $secondPlayerSession){
+            $winner = $secondPlayerSession;
         }
 
-        if ($_SESSION["pos21"] == "1" && $_SESSION["pos22"] == "1" && $_SESSION["pos23"] == "1"){
-            $winner = $_SESSION["secondPlayer"];
+        if ($gameInSession->{"pos21"} == $firstPlayerSession && $gameInSession->{"pos22"} == $firstPlayerSession && $gameInSession->{"pos23"} == $firstPlayerSession){
+            $winner = $firstPlayerSession;
         }
 
-        if ($_SESSION["pos31"] == "2" && $_SESSION["pos32"] == "2" && $_SESSION["pos33"] == "2"){
-            $winner = $_SESSION["firstPlayer"];
+        if ($gameInSession->{"pos31"} == $secondPlayerSession && $gameInSession->{"pos32"} == $secondPlayerSession && $gameInSession->{"pos33"} == $secondPlayerSession){
+            $winner = $secondPlayerSession;
         }
 
-        if ($_SESSION["pos31"] == "1" && $_SESSION["pos32"] == "1" && $_SESSION["pos33"] == "1"){
-            $winner = $_SESSION["secondPlayer"];
+        if ($gameInSession->{"pos31"} == $firstPlayerSession && $gameInSession->{"pos32"} == $firstPlayerSession && $gameInSession->{"pos33"} == $firstPlayerSession){
+            $winner = $firstPlayerSession;
         }
 
-        if ($_SESSION["pos11"] == "2" && $_SESSION["pos12"] == "2" && $_SESSION["pos13"] == "2"){
-            $winner = $_SESSION["firstPlayer"];
+        if ($gameInSession->{"pos11"} == $secondPlayerSession && $gameInSession->{"pos12"} == $secondPlayerSession && $gameInSession->{"pos13"} == $secondPlayerSession){
+            $winner = $secondPlayerSession;
         }
 
-        if ($_SESSION["pos11"] == "1" && $_SESSION["pos12"] == "1" && $_SESSION["pos13"] == "1"){
-            $winner = $_SESSION["secondPlayer"];
+        if ($gameInSession->{"pos11"} == $firstPlayerSession && $gameInSession->{"pos12"} == $firstPlayerSession && $gameInSession->{"pos13"} == $firstPlayerSession){
+            $winner = $firstPlayerSession;
         }
 
-        if ($_SESSION["pos12"] == "2" && $_SESSION["pos22"] == "2" && $_SESSION["pos32"] == "2"){
-            $winner = $_SESSION["firstPlayer"];
+        if ($gameInSession->{"pos12"} == $secondPlayerSession && $gameInSession->{"pos22"} == $secondPlayerSession && $gameInSession->{"pos32"} == $secondPlayerSession){
+            $winner = $secondPlayerSession;
         }
 
-        if ($_SESSION["pos12"] == "1" && $_SESSION["pos22"] == "1" && $_SESSION["pos32"] == "1"){
-            $winner = $_SESSION["secondPlayer"];
+        if ($gameInSession->{"pos12"} == $firstPlayerSession && $gameInSession->{"pos22"} == $firstPlayerSession && $gameInSession->{"pos32"} == $firstPlayerSession){
+            $winner = $firstPlayerSession;
         }
 
-        if ($_SESSION["pos13"] == "2" && $_SESSION["pos23"] == "2" && $_SESSION["pos33"] == "2"){
-            $winner = $_SESSION["firstPlayer"];
+        if ($gameInSession->{"pos13"} == $secondPlayerSession && $gameInSession->{"pos23"} == $secondPlayerSession && $gameInSession->{"pos33"} == $secondPlayerSession){
+            $winner = $secondPlayerSession;
         }
 
-        if ($_SESSION["pos13"] == "1" && $_SESSION["pos23"] == "1" && $_SESSION["pos33"] == "1"){
-            $winner = $_SESSION["secondPlayer"];
+        if ($gameInSession->{"pos13"} == $firstPlayerSession && $gameInSession->{"pos23"} == $firstPlayerSession && $gameInSession->{"pos33"} == $firstPlayerSession){
+            $winner = $firstPlayerSession;
         }
 
-        if ($_SESSION["pos13"] == "2" && $_SESSION["pos22"] == "2" && $_SESSION["pos31"] == "2"){
-            $winner = $_SESSION["firstPlayer"];
+        if ($gameInSession->{"pos13"} == $secondPlayerSession && $gameInSession->{"pos22"} == $secondPlayerSession && $gameInSession->{"pos31"} == $secondPlayerSession){
+            $winner = $secondPlayerSession;
         }
 
-        if ($_SESSION["pos13"] == "1" && $_SESSION["pos22"] == "1" && $_SESSION["pos31"] == "1"){
-            $winner = $_SESSION["secondPlayer"];
+        if ($gameInSession->{"pos13"} == $firstPlayerSession && $gameInSession->{"pos22"} == $firstPlayerSession && $gameInSession->{"pos31"} == $firstPlayerSession){
+            $winner = $firstPlayerSession;
         }
 
-        if ($_SESSION["pos11"] == "2" && $_SESSION["pos22"] == "2" && $_SESSION["pos33"] == "2"){
-            $winner = $_SESSION["firstPlayer"];
+        if ($gameInSession->{"pos11"} == $secondPlayerSession && $gameInSession->{"pos22"} == $secondPlayerSession && $gameInSession->{"pos33"} == $secondPlayerSession){
+            $winner = $secondPlayerSession;
         }
 
-        if ($_SESSION["pos11"] == "1" && $_SESSION["pos22"] == "1" && $_SESSION["pos33"] == "1"){
-            $winner = $_SESSION["secondPlayer"];
+        if ($gameInSession->{"pos11"} == $firstPlayerSession && $gameInSession->{"pos22"} == $firstPlayerSession && $gameInSession->{"pos33"} == $firstPlayerSession){
+            $winner = $firstPlayerSession;
         }
 
         return $winner;

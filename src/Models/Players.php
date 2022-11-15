@@ -9,21 +9,21 @@ class Players extends MySqlDB
 {
     public function getFirstPlayer(): array
     {
-        $data = MySqlDB::executeQuery("SELECT * FROM games 
-         WHERE first_player_id = {$_SESSION['firstPlayer']} 
-           AND second_player_id = {$_SESSION['secondPlayer']}");
-
-        MySqlDB::close();
-        return $data;
+        return MySqlDB::executeQuery("SELECT * FROM players WHERE id = {$_SESSION['firstPlayer']} ")[0];
     }
 
     public function getSecondPlayer(): array
     {
-        $data = MySqlDB::executeQuery("SELECT * FROM games 
-         WHERE first_player_id = {$_SESSION['firstPlayer']} 
-           AND second_player_id = {$_SESSION['secondPlayer']}");
+        return MySqlDB::executeQuery("SELECT * FROM players WHERE id = {$_SESSION['secondPlayer']}")[0];
+    }
 
-        MySqlDB::close();
-        return $data;
+    public function savePlayer($player): bool
+    {
+        return MySqlDB::executeInsert("INSERT INTO players (name) VALUES ('{$player}')");
+    }
+
+    public function getLastInsert(): int|string
+    {
+        return parent::getLastInsert();
     }
 }
