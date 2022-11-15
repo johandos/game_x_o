@@ -1,8 +1,8 @@
 <?php
 
-namespace App;
+namespace App\Services;
 
-class WinValidated
+class WinValidatedService
 {
     public function validated(): string
     {

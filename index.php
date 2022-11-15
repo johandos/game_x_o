@@ -2,9 +2,9 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-use App\GameBoard;
-use App\WinValidated;
-use App\Session;
+use App\Services\GameBoardService;
+use App\Services\WinValidatedService;
+use App\Utils\Session;
 
 $session = new Session();
 $firstPlayer = $session->getAttribute('firstPlayer');
@@ -36,9 +36,9 @@ $secondPlayer = $session->getAttribute('secondPlayer');
 
             <div class="mt-20 max-w-lg sm:mx-auto md:max-w-none flex flex-col items-center">
                 <?php if($_REQUEST):
-                    $gameBoard = new GameBoard;
+                    $gameBoard = new GameBoardService;
                     if ($_POST):
-                        //$firstPlayer = new Players($_POST['playerOne'], $_POST['playerTwo']);
+                        //$firstPlayer = new PlayersController($_POST['playerOne'], $_POST['playerTwo']);
                         $gameBoard->initialize();
                         $playerTurn = 1;
                     else:
@@ -87,7 +87,7 @@ $secondPlayer = $session->getAttribute('secondPlayer');
                         </div>
                     </div>
                 <?php else: ?>
-                    <form name="juego" action="index.php" method="post">
+                    <form name="juego" action="./src/Controllers/GameController.php" method="post">
                         <div class="grid grid-cols-1 gap-y-16 md:grid-cols-2 md:gap-x-12 md:gap-y-16">
                             <div class="relative flex flex-col gap-6 sm:flex-row md:flex-col lg:flex-row">
                                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-500 text-white sm:shrink-0">
@@ -129,7 +129,7 @@ $secondPlayer = $session->getAttribute('secondPlayer');
                 <?php endif; ?>
             </div>
             <?php if($_REQUEST):
-                $validateGame = new WinValidated; ?>
+                $validateGame = new WinValidatedService; ?>
                 <?php if ($validateGame->validated()): ?>
                     <div class="relative flex justify-center items-center">
                         <div id="menu" class="w-full h-full bg-gray-900 bg-opacity-80 top-0 fixed sticky-0">

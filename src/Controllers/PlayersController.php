@@ -1,8 +1,8 @@
 <?php
 
-namespace App;
+namespace App\Controllers;
 
-class Players
+class PlayersController
 {
     public function __construct($nameOne, $nameTwo)
     {

@@ -1,8 +1,8 @@
 <?php
 
-namespace App;
+namespace App\Services;
 
-class GameBoard
+class GameBoardService
 {
     public function showPositions($positionToShow, $playerTurn): string
     {

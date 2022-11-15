@@ -3,7 +3,7 @@
 
 namespace App\Models;
 
-use App\MySqlDB;
+use App\Utils\MySqlDB;
 
 class Game extends MySqlDB
 {
