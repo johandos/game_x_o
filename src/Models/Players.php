@@ -4,17 +4,13 @@
 namespace App\Models;
 
 use App\Utils\MySqlDB;
+use App\Utils\Session;
 
 class Players extends MySqlDB
 {
-    public function getFirstPlayer(): array
+    public function getPlayer($player): array
     {
-        return MySqlDB::executeQuery("SELECT * FROM players WHERE id = {$_SESSION['firstPlayer']} ")[0];
-    }
-
-    public function getSecondPlayer(): array
-    {
-        return MySqlDB::executeQuery("SELECT * FROM players WHERE id = {$_SESSION['secondPlayer']}")[0];
+        return MySqlDB::executeQuery("SELECT * FROM players WHERE id = {$player} ")[0];
     }
 
     public function savePlayer($player): bool

@@ -33,7 +33,7 @@ class MySqlDB
         return $this->connection;
     }
 
-    protected function executeQuery($sql): array
+    public function executeQuery($sql): array
     {
         $data = [];
         $result = mysqli_query($this->getConnection(), $sql);
@@ -47,7 +47,7 @@ class MySqlDB
         return $data;
     }
 
-    protected function executeInsert($sql): bool
+    public function executeInsert($sql): bool
     {
         return mysqli_query($this->getConnection(), $sql);
     }

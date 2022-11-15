@@ -37,7 +37,7 @@ class Session
 
     }
 
-    public function destroySession($attribute, $value): void
+    public function destroySession(): void
     {
         session_destroy();
     }
