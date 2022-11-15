@@ -2,7 +2,7 @@
 
 namespace App;
 
-class Comment
+class Session
 {
 
 }
