@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Models;
 
 use App\Utils\MySqlDB;
@@ -24,7 +23,7 @@ class Game
     public function getGameInSession(): array
     {
         return $this->mySqlDB->executeQuery("SELECT * FROM games 
-         WHERE first_player_id = {$this->firstPlayer} AND second_player_id = {$this->secondPlayer}")[0];
+         WHERE first_player_id = {$this->firstPlayer} AND second_player_id = {$this->secondPlayer} ORDER BY id DESC")[0];
     }
 
     public function saveGame($gamePositions): bool

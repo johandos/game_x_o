@@ -27,7 +27,7 @@ class Session
         return null;
     }
 
-    public function deleteAttribute($attribute)
+    public static function deleteAttribute($attribute)
     {
         if (session_status() === PHP_SESSION_ACTIVE && is_string($attribute) && isset($_SESSION[$attribute])){
             unset($_SESSION[$attribute]);
@@ -37,7 +37,7 @@ class Session
 
     }
 
-    public function destroySession(): void
+    public static function destroySession(): void
     {
         session_destroy();
     }

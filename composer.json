@@ -14,6 +14,7 @@
         "phpunit/phpunit": "^9.5"
     },
   "require": {
-    "ext-mysqli": "*"
+    "ext-mysqli": "*",
+        "symfony/routing": "^6.1"
   }
 }

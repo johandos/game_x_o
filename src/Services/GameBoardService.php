@@ -7,19 +7,6 @@ use App\Utils\Session;
 
 class GameBoardService
 {
-    public function showPositions($positionToShow, $positionValue, $playerTurn): string
-    {
-        $session = new Session();
-        $firstPlayer = $session->getAttribute('firstPlayer');
-        $secondPlayer = $session->getAttribute('secondPlayer');
-
-        return match ((int)$positionValue) {
-            $firstPlayer => "<img width='20px' src=\"../../public/img/o.jpg\"  alt='' />",
-            $secondPlayer => "<img width='20px' src=\"../../public/img/x.jpg\"  alt='' />",
-            default => "<a href=\"index.php?position=" . $positionToShow . "&turn=" . $playerTurn . "\"><img width='20px' src=\"../../public/img/default.png\"  alt='defaultImg' /></a>",
-        };
-    }
-
     public static function initialize(): string
     {
         $positions = [];
