@@ -15,6 +15,7 @@
     },
   "require": {
     "ext-mysqli": "*",
-        "symfony/routing": "^6.1"
+        "symfony/routing": "^6.1",
+        "vlucas/phpdotenv": "^5.5"
   }
 }
