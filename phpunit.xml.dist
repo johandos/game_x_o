@@ -3,8 +3,10 @@
     <testsuite name="Test directory">
         <directory>tests</directory>
     </testsuite>
-    <server name="MYSQL_HOST" value="127.0.0.1" />
-    <server name="MYSQL_USER" value="root" />
-    <server name="MYSQL_PASS" value="" />
-    <server name="MYSQL_DBNAME" value="game_x_o" />
+    <php>
+        <env name="DB_HOST" value="127.0.0.1"  force="true" />
+        <env name="DB_USER" value="root"  force="true" />
+        <env name="DB_PASS" value=""  force="true" />
+        <env name="DB_DBNAME" value="game_x_o"  force="true" />
+    </php>
 </phpunit>

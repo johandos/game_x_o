@@ -20,10 +20,10 @@ class MySqlDB
     protected function setConnection(): void
     {
         $this->connection = @mysqli_connect(
-            $_ENV['HOST'],
-            $_ENV['USER'],
-            $_ENV['PASS'],
-            $_ENV['DBNAME']
+            $_ENV['DB_HOST'],
+            $_ENV['DB_USER'],
+            $_ENV['DB_PASS'],
+            $_ENV['DB_DBNAME']
         );
         $this->connection->set_charset('utf8');
     }
