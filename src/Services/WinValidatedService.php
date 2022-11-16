@@ -23,9 +23,13 @@ class WinValidatedService
         $player = new Players();
         $firstPlayer = $player->getPlayer($firstPlayerSession);
         $secondPlayer = $player->getPlayer($secondPlayerSession);
-
+    
         if ($gameInSession->{"pos11"} == $firstPlayerSession && $gameInSession->{"pos21"} == $firstPlayerSession && $gameInSession->{"pos31"} == $firstPlayerSession){
             $winner = $firstPlayer['name'];
+        }
+    
+        if ($gameInSession->{"pos11"} == $secondPlayerSession && $gameInSession->{"pos21"} == $secondPlayerSession && $gameInSession->{"pos31"} == $secondPlayerSession){
+            $winner = $secondPlayerSession['name'];
         }
 
         if ($gameInSession->{"pos21"} == $secondPlayerSession && $gameInSession->{"pos22"} == $secondPlayerSession && $gameInSession->{"pos23"} == $secondPlayerSession){

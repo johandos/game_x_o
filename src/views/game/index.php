@@ -19,7 +19,7 @@
         
         <div class="mt-20 max-w-lg sm:mx-auto md:max-w-none flex flex-col items-center">
             <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600">
-                <?= "El turno es para: {$data['firstPlayer']['name']}"; ?>
+                <?= "El turno es para: {$data['playerTurn']}"; ?>
             </p>
             <div class="flex flex-col">
                 <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">

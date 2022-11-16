@@ -15,18 +15,18 @@ class GameController extends View
         $session = new Session();
         $firstPlayerSession = $session->getAttribute('firstPlayer');
         $secondPlayerSession = $session->getAttribute('secondPlayer');
+        $playerTurn = $session->getAttribute('playerTurn');
     
         $player = new Players();
         $firstPlayer = $player->getPlayer($firstPlayerSession);
         $secondPlayer = $player->getPlayer($secondPlayerSession);
-        $playerTurn = $playerTurn ?? $session->getAttribute('turn');
     
         $game = new Game();
     
         $data['firstPlayer'] = $firstPlayer;
         $data['secondPlayer'] = $secondPlayer;
         $data['gamePositions'] = $game->getGameInSession()["positions"];
-        $data['turn'] = $playerTurn;
+        $data['playerTurn'] = $playerTurn;
         echo View::render('game/index', $data);
     }
     
@@ -35,6 +35,7 @@ class GameController extends View
         $firstPlayer = new Players();
         $secondPlayer = new Players();
         $session = new Session();
+        
         if (isset($_POST['restart'])){
             Session::deleteAttribute('gamePositions');
         }else{
@@ -48,45 +49,38 @@ class GameController extends View
             $session->setAttribute('secondPlayer', $secondPlayerId);
         }
         
-        $firstPlayer = $firstPlayer->getPlayer($firstPlayerId ?? $session->getAttribute('firstPlayer'));
-        $secondPlayer = $secondPlayer->getPlayer($secondPlayerId ?? $session->getAttribute('secondPlayer'));
-    
+        $session->setAttribute("turn", $session->getAttribute('firstPlayer'));
+        $player = new Players();
+        $playerTurnName = $player->getPlayer($session->getAttribute('firstPlayer'));
+        $session->setAttribute("playerTurn", $playerTurnName['name']);
+        
         $game = new Game();
         $gameBoard = new GameBoardService;
         $gamePositions = $gameBoard->initialize();
         $game->saveGame($gamePositions);
     
-        $data['firstPlayer'] = $firstPlayer;
-        $data['secondPlayer'] = $secondPlayer;
-        $data['gamePositions'] = $gamePositions;
-        $data['turn'] = $session->getAttribute('turn');
-        echo View::render('game/index', $data);
+        header('Location: /game/index');
     }
     
     public function savePosition()
     {
-        $session = new Session();
-        $firstPlayerSession = $session->getAttribute('firstPlayer');
-        $secondPlayerSession = $session->getAttribute('secondPlayer');
-        $playerTurn = $session->getAttribute('turn');
-    
-        $player = new Players();
-        $firstPlayer = $player->getPlayer($firstPlayerSession);
-        $secondPlayer = $player->getPlayer($secondPlayerSession);
-    
         $game = new Game();
         $gameInSession = $game->getGameInSession();
         $gameBoard = new GameBoardService;
+        $session = new Session();
+        $playerTurn = $session->getAttribute('turn');
+        $firstPlayer = $session->getAttribute('firstPlayer');
+        $secondPlayer = $session->getAttribute('secondPlayer');
+        $nextTurn = $playerTurn == $firstPlayer ? $secondPlayer : $firstPlayer;
+    
+        if (isset($_GET['position']) && isset($_GET['positionValue'])){
+            $gameBoard->savePositionInGame($_GET['position'], $gameInSession["id"], $playerTurn);
+            $session->setAttribute("turn", $nextTurn);
+            $player = new Players();
+            $playerTurnName = $player->getPlayer($nextTurn);
+            $session->setAttribute("playerTurn", $playerTurnName['name']);
+        }
         
-        if (isset($_GET['position'])):
-            $gameBoard->savePositionInGame($_GET['position'], $playerTurn, $gameInSession["id"]);
-            $playerTurn == $firstPlayer['id'] ? $session->setAttribute('turn', $secondPlayer['id']) : $session->setAttribute('turn', $firstPlayer['id']);
-        endif;
-        
-        $data['firstPlayer'] = $firstPlayer;
-        $data['secondPlayer'] = $secondPlayer;
-        $data['gamePositions'] = $gameInSession["positions"];
-        $data['turn'] = $playerTurn;
-        echo View::render('game/index', $data);
+        header('Location: /game/index');
     }
 }

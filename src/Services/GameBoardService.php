@@ -24,9 +24,9 @@ class GameBoardService
         return json_encode($positions);
     }
 
-    public function savePositionInGame($position, $valuePosition, $gameId): void
+    public function savePositionInGame($position, $gameId, $playerTurn): void
     {
         $game = new Game();
-        $game->updateGamePosition($position, $valuePosition, $gameId);
+        $game->updateGamePosition($position, $gameId, $playerTurn);
     }
 }

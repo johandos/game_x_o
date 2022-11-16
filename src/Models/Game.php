@@ -33,8 +33,8 @@ class Game
         return true;
     }
 
-    public function updateGamePosition($position, $valuePosition, $gameId): bool
+    public function updateGamePosition($position, $gameId, $playerTurn): bool
     {
-        return $this->mySqlDB->executeInsert("UPDATE games SET positions = JSON_SET(positions, '$.$position', '$valuePosition') WHERE id = {$gameId}");
+        return $this->mySqlDB->executeInsert("UPDATE games SET positions = JSON_SET(positions, '$.$position', '$playerTurn') WHERE id = {$gameId}");
     }
 }
