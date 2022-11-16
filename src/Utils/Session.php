@@ -36,10 +36,15 @@ class Session
         return null;
 
     }
-
+    
     public static function destroySession(): void
     {
         session_destroy();
+    }
+    
+    public static function statusSession(): int
+    {
+        return session_status();
     }
 
 }

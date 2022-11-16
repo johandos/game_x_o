@@ -16,7 +16,9 @@ class Router
     {
         $url = explode("/", __URL__);
         $this->controller = !empty($url[1]) ? camelCase($url[1]) : 'Base';
-        $this->method = explode("?", $url[2]);
+        if (isset($url[2])){
+            $this->method = explode("?", $url[2]);
+        }
         $this->method = !empty($this->method[0]) ? camelCase($this->method[0]) : 'index';
         $this->controller = "{$this->controller}Controller";
     }

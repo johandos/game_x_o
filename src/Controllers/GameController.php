@@ -75,20 +75,17 @@ class GameController extends View
         $secondPlayer = $player->getPlayer($secondPlayerSession);
     
         $game = new Game();
-    
+        $gameInSession = $game->getGameInSession();
         $gameBoard = new GameBoardService;
         
         if (isset($_GET['position'])):
-            $game = new Game();
-            $gameSession = $game->getGameInSession();
-            $gameBoard->savePositionInGame($_GET['position'], $playerTurn, $gameSession["id"]);
+            $gameBoard->savePositionInGame($_GET['position'], $playerTurn, $gameInSession["id"]);
             $playerTurn == $firstPlayer['id'] ? $session->setAttribute('turn', $secondPlayer['id']) : $session->setAttribute('turn', $firstPlayer['id']);
         endif;
-    
-    
+        
         $data['firstPlayer'] = $firstPlayer;
         $data['secondPlayer'] = $secondPlayer;
-        $data['gamePositions'] = $game->getGameInSession()["positions"];
+        $data['gamePositions'] = $gameInSession["positions"];
         $data['turn'] = $playerTurn;
         echo View::render('game/index', $data);
     }
