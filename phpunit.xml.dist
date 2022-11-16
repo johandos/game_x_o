@@ -3,4 +3,8 @@
     <testsuite name="Test directory">
         <directory>tests</directory>
     </testsuite>
+    <server name="MYSQL_HOST" value="127.0.0.1" />
+    <server name="MYSQL_USER" value="root" />
+    <server name="MYSQL_PASS" value="" />
+    <server name="MYSQL_DBNAME" value="game_x_o" />
 </phpunit>
