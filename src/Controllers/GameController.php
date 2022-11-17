@@ -7,26 +7,33 @@ use App\Models\Players;
 use App\Services\GameBoardService;
 use App\Utils\Session;
 use App\Utils\View;
+use Exception;
 
 class GameController extends View
 {
+    private int $playerTurn;
+    private int $firstPlayerId;
+    private int $secondPlayerId;
+    private Session $session;
+    
+    public function __constructor(){
+        $this->session = new Session();
+        $this->playerTurn = $this->session->getAttribute('turn');
+        $this->firstPlayerId = $this->session->getAttribute('firstPlayer');
+        $this->secondPlayerId = $this->session->getAttribute('secondPlayer');
+    }
+    
     public function index()
     {
-        $session = new Session();
-        $firstPlayerSession = $session->getAttribute('firstPlayer');
-        $secondPlayerSession = $session->getAttribute('secondPlayer');
-        $playerTurn = $session->getAttribute('playerTurn');
-    
-        $player = new Players();
-        $firstPlayer = $player->getPlayer($firstPlayerSession);
-        $secondPlayer = $player->getPlayer($secondPlayerSession);
-    
         $game = new Game();
+        $player = new Players();
+        $firstPlayerId = $player->getPlayer($this->firstPlayerId);
+        $secondPlayerId = $player->getPlayer($this->secondPlayerId);
     
-        $data['firstPlayer'] = $firstPlayer;
-        $data['secondPlayer'] = $secondPlayer;
-        $data['gamePositions'] = $game->getGameInSession()["positions"];
-        $data['playerTurn'] = $playerTurn;
+        $data['firstPlayer'] = $firstPlayerId;
+        $data['secondPlayer'] = $secondPlayerId;
+        $data['gamePositions'] = $game->getGameInSession($firstPlayerId, $secondPlayerId)["positions"];
+        $data['playerTurn'] = $this->playerTurn;
         echo View::render('game/index', $data);
     }
     
@@ -49,36 +56,34 @@ class GameController extends View
             $session->setAttribute('secondPlayer', $secondPlayerId);
         }
         
-        $session->setAttribute("turn", $session->getAttribute('firstPlayer'));
+        $session->setAttribute("turn", $this->firstPlayerId);
         $player = new Players();
-        $playerTurnName = $player->getPlayer($session->getAttribute('firstPlayer'));
+        $playerTurnName = $player->getPlayer($this->firstPlayerId);
         $session->setAttribute("playerTurn", $playerTurnName['name']);
         
         $game = new Game();
         $gameBoard = new GameBoardService;
         $gamePositions = $gameBoard->initialize();
-        $game->saveGame($gamePositions);
+        $game->saveGame($gamePositions, $this->firstPlayerId, $this->secondPlayerId);
     
         header('Location: /game/index');
     }
     
+    /**
+     * @throws Exception
+     */
     public function savePosition()
     {
         $game = new Game();
-        $gameInSession = $game->getGameInSession();
-        $gameBoard = new GameBoardService;
-        $session = new Session();
-        $playerTurn = $session->getAttribute('turn');
-        $firstPlayer = $session->getAttribute('firstPlayer');
-        $secondPlayer = $session->getAttribute('secondPlayer');
-        $nextTurn = $playerTurn == $firstPlayer ? $secondPlayer : $firstPlayer;
+        $gameInSession = $game->getGameInSession($this->firstPlayerId, $this->secondPlayerId);
+        $nextTurn = $this->playerTurn == $this->firstPlayerId ? $this->secondPlayerId : $this->firstPlayerId;
     
         if (isset($_GET['position']) && isset($_GET['positionValue'])){
-            $gameBoard->savePositionInGame($_GET['position'], $gameInSession["id"], $playerTurn);
-            $session->setAttribute("turn", $nextTurn);
+            GameBoardService::updateGamePosition($_GET['position'], $gameInSession["id"], $this->playerTurn);
+            $this->session->setAttribute("turn", $nextTurn);
             $player = new Players();
             $playerTurnName = $player->getPlayer($nextTurn);
-            $session->setAttribute("playerTurn", $playerTurnName['name']);
+            $this->session->setAttribute("playerTurn", $playerTurnName['name']);
         }
         
         header('Location: /game/index');

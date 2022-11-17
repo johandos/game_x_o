@@ -7,6 +7,6 @@
         <env name="DB_HOST" value="127.0.0.1"  force="true" />
         <env name="DB_USER" value="root"  force="true" />
         <env name="DB_PASS" value=""  force="true" />
-        <env name="DB_DBNAME" value="game_x_o"  force="true" />
+        <env name="DB_DBNAME" value="game_x_o_test"  force="true" />
     </php>
 </phpunit>

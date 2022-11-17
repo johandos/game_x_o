@@ -4,33 +4,35 @@ namespace App\Models;
 
 use App\Utils\MySqlDB;
 use App\Utils\Session;
+use Exception;
 
 class Game
 {
     private MySqlDB $mySqlDB;
-    private mixed $firstPlayer;
-    private mixed $secondPlayer;
 
     public function __construct()
     {
         $this->mySqlDB = new MySqlDB();
-
-        $session = new Session();
-        $this->firstPlayer = $session->getAttribute('firstPlayer');
-        $this->secondPlayer = $session->getAttribute('secondPlayer');
+    }
+    
+    /**
+     * @throws Exception
+     */
+    public function getGameInSession($firstPlayerId, $secondPlayerId): string|array
+    {
+        // get the last game in BD found by players in session
+        $games = $this->mySqlDB->executeQuery("SELECT * FROM games WHERE first_player_id = {$firstPlayerId} AND second_player_id = {$secondPlayerId} ORDER BY id DESC");
+        if (!empty($games)){
+            return $games[0];
+        }
+        
+        throw new Exception("Error al encontrar el juego en session");
     }
 
-    public function getGameInSession(): array
+    public function saveGame($gamePositions, $firstPlayerId, $secondPlayerId): bool
     {
-        return $this->mySqlDB->executeQuery("SELECT * FROM games 
-         WHERE first_player_id = {$this->firstPlayer} AND second_player_id = {$this->secondPlayer} ORDER BY id DESC")[0];
-    }
-
-    public function saveGame($gamePositions): bool
-    {
-        $this->mySqlDB->executeInsert("INSERT INTO games (first_player_id, second_player_id, positions) 
-            VALUES ('{$this->firstPlayer}', '{$this->secondPlayer}', '{$gamePositions}')");
-        return true;
+        return $this->mySqlDB->executeInsert("INSERT INTO games (first_player_id, second_player_id, positions)
+            VALUES ('{$firstPlayerId}', '{$secondPlayerId}', '{$gamePositions}')");
     }
 
     public function updateGamePosition($position, $gameId, $playerTurn): bool
