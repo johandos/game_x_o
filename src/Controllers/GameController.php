@@ -11,37 +11,41 @@ use Exception;
 
 class GameController extends View
 {
-    private int $playerTurn;
-    private int $firstPlayerId;
-    private int $secondPlayerId;
-    private Session $session;
-    
-    public function __constructor(){
-        $this->session = new Session();
-        $this->playerTurn = $this->session->getAttribute('turn');
-        $this->firstPlayerId = $this->session->getAttribute('firstPlayer');
-        $this->secondPlayerId = $this->session->getAttribute('secondPlayer');
-    }
-    
+    /**
+     * @throws Exception
+     */
     public function index()
     {
-        $game = new Game();
-        $player = new Players();
-        $firstPlayerId = $player->getPlayer($this->firstPlayerId);
-        $secondPlayerId = $player->getPlayer($this->secondPlayerId);
+        $session = new Session();
+        $firstPlayerId = $session->getAttribute('firstPlayer');
+        $secondPlayerId = $session->getAttribute('secondPlayer');
+        $playerTurn = $session->getAttribute('playerTurn');
     
-        $data['firstPlayer'] = $firstPlayerId;
-        $data['secondPlayer'] = $secondPlayerId;
+        $player = new Players();
+        $firstPlayer = $player->getPlayer($firstPlayerId);
+        $secondPlayer = $player->getPlayer($secondPlayerId);
+    
+        $game = new Game();
+    
+        $data['firstPlayer'] = $firstPlayer;
+        $data['secondPlayer'] = $secondPlayer;
         $data['gamePositions'] = $game->getGameInSession($firstPlayerId, $secondPlayerId)["positions"];
-        $data['playerTurn'] = $this->playerTurn;
+        $data['playerTurn'] = $playerTurn;
         echo View::render('game/index', $data);
     }
     
     public function store()
     {
+        if (Session::statusSession() != PHP_SESSION_NONE){
+            Session::destroySession();
+        }
+        
         $firstPlayer = new Players();
         $secondPlayer = new Players();
         $session = new Session();
+    
+        $firstPlayerId = $session->getAttribute('firstPlayer');
+        $secondPlayerId = $session->getAttribute('secondPlayer');
         
         if (isset($_POST['restart'])){
             Session::deleteAttribute('gamePositions');
@@ -56,15 +60,11 @@ class GameController extends View
             $session->setAttribute('secondPlayer', $secondPlayerId);
         }
         
-        $session->setAttribute("turn", $this->firstPlayerId);
-        $player = new Players();
-        $playerTurnName = $player->getPlayer($this->firstPlayerId);
-        $session->setAttribute("playerTurn", $playerTurnName['name']);
-        
         $game = new Game();
         $gameBoard = new GameBoardService;
         $gamePositions = $gameBoard->initialize();
-        $game->saveGame($gamePositions, $this->firstPlayerId, $this->secondPlayerId);
+        $game->saveGame($gamePositions, $firstPlayerId, $secondPlayerId);
+        $session->setAttribute("turn", $session->getAttribute('firstPlayer'));
     
         header('Location: /game/index');
     }
@@ -74,16 +74,23 @@ class GameController extends View
      */
     public function savePosition()
     {
+        $session = new Session();
+        $firstPlayerId = $session->getAttribute('firstPlayer');
+        $secondPlayerId = $session->getAttribute('secondPlayer');
         $game = new Game();
-        $gameInSession = $game->getGameInSession($this->firstPlayerId, $this->secondPlayerId);
-        $nextTurn = $this->playerTurn == $this->firstPlayerId ? $this->secondPlayerId : $this->firstPlayerId;
+        $gameInSession = $game->getGameInSession($firstPlayerId, $secondPlayerId);
+        $session = new Session();
+        $playerTurn = $session->getAttribute('turn');
+        $firstPlayer = $session->getAttribute('firstPlayer');
+        $secondPlayer = $session->getAttribute('secondPlayer');
+        $nextTurn = $playerTurn == $firstPlayer ? $secondPlayer : $firstPlayer;
     
-        if (isset($_GET['position']) && isset($_GET['positionValue'])){
-            GameBoardService::updateGamePosition($_GET['position'], $gameInSession["id"], $this->playerTurn);
-            $this->session->setAttribute("turn", $nextTurn);
+        if (isset($_GET['position'])){
+            GameBoardService::updateGamePosition($_GET['position'], $gameInSession["id"], $playerTurn);
+            $session->setAttribute("turn", $nextTurn);
             $player = new Players();
             $playerTurnName = $player->getPlayer($nextTurn);
-            $this->session->setAttribute("playerTurn", $playerTurnName['name']);
+            $session->setAttribute("playerTurn", $playerTurnName['name']);
         }
         
         header('Location: /game/index');

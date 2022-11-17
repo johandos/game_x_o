@@ -16,6 +16,7 @@
   "require": {
     "ext-mysqli": "*",
         "symfony/routing": "^6.1",
-        "vlucas/phpdotenv": "^5.5"
+        "vlucas/phpdotenv": "^5.5",
+        "symfony/var-dumper": "^6.1"
   }
 }

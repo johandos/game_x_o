@@ -22,6 +22,7 @@ class Game
     {
         // get the last game in BD found by players in session
         $games = $this->mySqlDB->executeQuery("SELECT * FROM games WHERE first_player_id = {$firstPlayerId} AND second_player_id = {$secondPlayerId} ORDER BY id DESC");
+
         if (!empty($games)){
             return $games[0];
         }

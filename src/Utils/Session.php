@@ -11,14 +11,14 @@ class Session
         }
     }
 
-    public function setAttribute($attribute, $value): void
+    public static function setAttribute($attribute, $value): void
     {
         if (session_status() === PHP_SESSION_ACTIVE && is_string($attribute)){
             $_SESSION[$attribute] = $value;
         }
     }
 
-    public function getAttribute($attribute)
+    public static function getAttribute($attribute)
     {
         if (session_status() === PHP_SESSION_ACTIVE && is_string($attribute) && isset($_SESSION[$attribute])){
             return $_SESSION[$attribute];
