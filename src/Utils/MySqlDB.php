@@ -36,7 +36,7 @@ class MySqlDB
     public function executeQuery($sql): array
     {
         $data = [];
-        $result = mysqli_query($this->getConnection(), $sql);
+        $result = mysqli_query(self::getConnection(), $sql);
 
         if (mysqli_num_rows($result) > 0){
             while ($row = mysqli_fetch_assoc($result)){
@@ -47,9 +47,9 @@ class MySqlDB
         return $data;
     }
 
-    public function executeInsert($sql): bool
+    public static function executeInsert($sql): bool
     {
-        return mysqli_query($this->getConnection(), $sql);
+        return mysqli_query(self::getConnection(), $sql);
     }
 
     protected function numRows($sql): int

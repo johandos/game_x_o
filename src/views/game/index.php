@@ -10,11 +10,9 @@
     <div class="mx-auto max-w-7xl px-6 lg:px-8">
         <div class="sm:text-center">
             <h2 class="text-lg font-semibold leading-8 text-indigo-600">Juego de 3 en raya</h2>
-            <?php if(isset($data['firstPlayer']) && isset($data['secondPlayer'])): ?>
-                <h2 class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                    <?= "{$data['firstPlayer']['name']} vs {$data['secondPlayer']['name']}" ?>
-                </h2>
-            <?php endif; ?>
+            <h2 class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                <?= "{$data['firstPlayer']['name']} vs {$data['secondPlayer']['name']}" ?>
+            </h2>
         </div>
         
         <div class="mt-20 max-w-lg sm:mx-auto md:max-w-none flex flex-col items-center">
@@ -27,18 +25,16 @@
                         <div class="overflow-hidden">
                             <table class="border-collapse border border-slate-500">
                                 <tbody>
-                                <?php if(isset($data['firstPlayer']) && isset($data['secondPlayer'])):
-                                        $createTr = true;
-                                        foreach(json_decode($data['gamePositions']) as $key => $position): ?>
-                                            <?php if(str_ends_with($key, "1")): ?>
-                                                <tr class="bg-white border-b">
-                                            <?php endif; ?>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r"><?= showPositions($key, $position) ?></td>
-                                            <?php if(str_ends_with($key, "3")): ?>
-                                                </tr>
-                                            <?php endif; ?>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
+                                    <?php $createTr = true; ?>
+                                    <?php foreach(json_decode($data['gamePositions']) as $key => $position): ?>
+                                        <?php if(str_ends_with($key, "1")): ?>
+                                            <tr class="bg-white border-b">
+                                        <?php endif; ?>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r"><?= showPositions($key, $position) ?></td>
+                                        <?php if(str_ends_with($key, "3")): ?>
+                                            </tr>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
                                 </tbody>
                             </table>
                         </div>
@@ -63,28 +59,26 @@
     
     
     <?php $validateGame = new App\Services\WinValidatedService; ?>
-    <?php if($data['firstPlayer'] && $data['secondPlayer']): ?>
-        <?php if ($validateGame->validated()): ?>
-            <div class="relative flex justify-center items-center">
-                <div id="menu" class="w-full h-full bg-gray-900 bg-opacity-80 top-0 fixed sticky-0">
-                    <div class="2xl:container  2xl:mx-auto py-48 px-4 md:px-28 flex justify-center items-center">
-                        <div class="w-96 md:w-auto dark:bg-gray-800 relative flex flex-col justify-center items-center bg-white py-16 px-4 md:px-24 xl:py-24 xl:px-36">
-                            <div class="mt-12">
-                                <h1 role="main" class="text-3xl dark:text-white lg:text-4xl font-semibold leading-7 lg:leading-9 text-center text-gray-800">
-                                    <?= "El jugador ganador es {$validateGame->validated()}"; ?>
-                                </h1>
-                            </div>
-                            <button onclick="showMenu(true)" class="text-gray-800 dark:text-gray-400 absolute top-8 right-8 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800" aria-label="close">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M18 6L6 18" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" />
-                                    <path d="M6 6L18 18" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </button>
+    <?php if(isset($data['winner'])): ?>
+        <div class="relative flex justify-center items-center">
+            <div id="menu" class="w-full h-full bg-gray-900 bg-opacity-80 top-0 fixed sticky-0">
+                <div class="2xl:container  2xl:mx-auto py-48 px-4 md:px-28 flex justify-center items-center">
+                    <div class="w-96 md:w-auto dark:bg-gray-800 relative flex flex-col justify-center items-center bg-white py-16 px-4 md:px-24 xl:py-24 xl:px-36">
+                        <div class="mt-12">
+                            <h1 role="main" class="text-3xl dark:text-white lg:text-4xl font-semibold leading-7 lg:leading-9 text-center text-gray-800">
+                                <?= "El jugador ganador es {$data['winner']}"; ?>
+                            </h1>
                         </div>
+                        <button onclick="showMenu(true)" class="text-gray-800 dark:text-gray-400 absolute top-8 right-8 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800" aria-label="close">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 6L6 18" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M6 6L18 18" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </div>
-        <?php endif; ?>
+        </div>
     <?php endif; ?>
 </div>
 </body>

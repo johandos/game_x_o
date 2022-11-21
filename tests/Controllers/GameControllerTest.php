@@ -2,18 +2,14 @@
 
 namespace Tests\Controllers;
 
-use App\Controllers\PlayersController;
 use App\Services\GameBoardService;
 use PHPUnit\Framework\TestCase;
 
 class GameControllerTest extends TestCase
 {
-    
-    
-    public function test_start_game()
+    public function test_game_index()
     {
-        $gameBoard = new GameBoardService();
-        $players = new PlayersController("Juan", "David");
+    
     }
     
     public function test_validate_winner()

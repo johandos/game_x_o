@@ -12,17 +12,11 @@ class WinValidatedService
     /**
      * @throws Exception
      */
-    public function validated(): string
+    public function validated(int $firstPlayerId, int $secondPlayerId, string $gameInSession): string
     {
         $winner = false;
-
-        $session = new Session();
-        $firstPlayerId = $session->getAttribute('firstPlayer');
-        $secondPlayerId = $session->getAttribute('secondPlayer');
     
-        $gameInSession = new Game();
-        $gameInSession = $gameInSession->getGameInSession($firstPlayerId, $secondPlayerId);
-        $gameInSession = json_decode($gameInSession["positions"]);
+        $gameInSession = json_decode($gameInSession);
     
         $player = new Players();
         $firstPlayer = $player->getPlayer($firstPlayerId);
@@ -33,7 +27,7 @@ class WinValidatedService
         }
     
         if ($gameInSession->{"pos11"} == $secondPlayerId && $gameInSession->{"pos21"} == $secondPlayerId && $gameInSession->{"pos31"} == $secondPlayerId){
-            $winner = $secondPlayerId['name'];
+            $winner = $secondPlayer['name'];
         }
 
         if ($gameInSession->{"pos21"} == $secondPlayerId && $gameInSession->{"pos22"} == $secondPlayerId && $gameInSession->{"pos23"} == $secondPlayerId){

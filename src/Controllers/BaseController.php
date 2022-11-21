@@ -10,7 +10,7 @@ class BaseController extends View
     public function index(): void
     {
         if (Session::statusSession() != PHP_SESSION_NONE){
-            Session::destroySession();
+            Session::destroy();
         }
         
         echo View::render('base/index');

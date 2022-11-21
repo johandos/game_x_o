@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\Game;
 use App\Models\Players;
 use App\Services\GameBoardService;
+use App\Services\WinValidatedService;
 use App\Utils\Session;
 use App\Utils\View;
 use Exception;
@@ -16,31 +17,43 @@ class GameController extends View
      */
     public function index()
     {
-        $session = new Session();
-        $firstPlayerId = $session->getAttribute('firstPlayer');
-        $secondPlayerId = $session->getAttribute('secondPlayer');
-        $playerTurn = $session->getAttribute('playerTurn');
+        Session::start();
+        if (Session::existsAttribute('firstPlayer') && Session::existsAttribute('secondPlayer')){
+            $firstPlayerId = Session::getAttribute('firstPlayer');
+            $secondPlayerId = Session::getAttribute('secondPlayer');
+            $playerTurn = Session::getAttribute('playerTurn');
+            $player = new Players();
+            $firstPlayer = $player->getPlayer($firstPlayerId);
+            $secondPlayer = $player->getPlayer($secondPlayerId);
     
-        $player = new Players();
-        $firstPlayer = $player->getPlayer($firstPlayerId);
-        $secondPlayer = $player->getPlayer($secondPlayerId);
+            $game = new Game();
+            $game = $game->getGameInSession($firstPlayerId, $secondPlayerId);
     
-        $game = new Game();
+            $validateGame = new WinValidatedService;
+            $winner = $validateGame->validated($firstPlayerId, $secondPlayerId, $game["positions"]);
+            if ($winner){
+                $data['winner'] = $winner;
+            }
     
-        $data['firstPlayer'] = $firstPlayer;
-        $data['secondPlayer'] = $secondPlayer;
-        $data['gamePositions'] = $game->getGameInSession($firstPlayerId, $secondPlayerId)["positions"];
-        $data['playerTurn'] = $playerTurn;
-        echo View::render('game/index', $data);
+            $data['firstPlayer'] = $firstPlayer;
+            $data['secondPlayer'] = $secondPlayer;
+            $data['gamePositions'] = $game["positions"];
+            $data['playerTurn'] = $playerTurn;
+            echo View::render('game/index', $data);
+        }else{
+            dd("session expirada");
+        }
     }
     
+    /**
+     * @throws Exception
+     */
     public function store()
     {
         if (Session::statusSession() != PHP_SESSION_NONE){
-            Session::destroySession();
+            Session::destroy();
         }
         
-        $firstPlayer = new Players();
         $secondPlayer = new Players();
         $session = new Session();
     
@@ -50,6 +63,7 @@ class GameController extends View
         if (isset($_POST['restart'])){
             Session::deleteAttribute('gamePositions');
         }else{
+            $firstPlayer = new Players();
             $firstPlayer->savePlayer($_POST["playerOne"]);
             $firstPlayerId = $firstPlayer->getLastInsert();
     
@@ -59,12 +73,18 @@ class GameController extends View
             $session->setAttribute('firstPlayer', $firstPlayerId);
             $session->setAttribute('secondPlayer', $secondPlayerId);
         }
-        
-        $game = new Game();
+    
         $gameBoard = new GameBoardService;
         $gamePositions = $gameBoard->initialize();
+        
+        $game = new Game();
         $game->saveGame($gamePositions, $firstPlayerId, $secondPlayerId);
+        
         $session->setAttribute("turn", $session->getAttribute('firstPlayer'));
+    
+        $firstPlayer = new Players();
+        $firstPlayer = $firstPlayer->getPlayer($firstPlayerId);
+        $session->setAttribute("playerTurn", $firstPlayer['name']);
     
         header('Location: /game/index');
     }

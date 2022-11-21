@@ -14,7 +14,7 @@ class Players extends MySqlDB
     public function getPlayer(int $id): array
     {
         // get the last game in BD found by players in session
-        $player = MySqlDB::executeQuery("SELECT * FROM players WHERE id = {$id} ");
+        $player = parent::executeQuery("SELECT * FROM players WHERE id = {$id} ");
         if (!empty($player)){
             return $player[0];
         }
@@ -22,9 +22,9 @@ class Players extends MySqlDB
         throw new Exception("Error al encontrar el jugador");
     }
 
-    public function savePlayer(string $name): bool
+    public static function savePlayer(string $name): bool
     {
-        return MySqlDB::executeInsert("INSERT INTO players (name) VALUES ('{$name}')");
+        return parent::executeInsert("INSERT INTO players (name) VALUES ('{$name}')");
     }
 
     public function getLastInsert(): int|string
