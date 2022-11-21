@@ -6,10 +6,6 @@ use mysqli;
 
 class MySqlDB
 {
-    protected string $host = "127.0.0.1";
-    protected string $user = "root";
-    protected string $pass = "";
-    protected string $dbname = "game_x_o";
     protected mysqli|false $connection;
 
     function __construct()
@@ -49,23 +45,8 @@ class MySqlDB
 
     public static function executeInsert($sql): bool
     {
-        return mysqli_query(self::getConnection(), $sql);
-    }
-
-    protected function numRows($sql): int
-    {
-        $result = mysqli_query($this->connection, $sql);
-        return mysqli_num_rows($result);
-    }
-
-    protected function getDataSingle($sql): array|null
-    {
-        $result = mysqli_query($this->connection, $sql);
-        if (mysqli_num_rows($result) > 0){
-            return mysqli_fetch_assoc($result);
-        }
-
-        return null;
+        $connection = new self();
+        return mysqli_query($connection->getConnection(), $sql);
     }
 
     protected function getLastInsert(): int|string
